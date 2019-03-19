@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import http from "http";
+import io from "socket.io";
 import WebSocket, { AddressInfo } from "ws";
 import * as wsListener from "./listeners/websockets";
 
@@ -11,8 +12,9 @@ const port = process.env.SERVER_PORT;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-app.locals.wss = wss;
-wsListener.register(wss);
+app.locals.io = io(server);
+
+wsListener.register(app);
 
 // define a route handler for the default home page
 app.get( "/", ( req, res ) => {
