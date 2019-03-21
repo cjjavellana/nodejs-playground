@@ -3,8 +3,9 @@ import express from "express";
 import http from "http";
 import io from "socket.io";
 import WebSocket, { AddressInfo } from "ws";
-import * as socketio from "./websockets";
+import * as redis from "./redis";
 import * as apiv1 from "./routes/v1";
+import * as socketio from "./websockets";
 
 dotenv.config();
 
@@ -18,7 +19,8 @@ app.locals.io = io(server, {
 });
 
 socketio.register(app);
-apiv1.register(app)
+apiv1.register(app);
+redis.register(app);
 
 // define a route handler for the default home page
 app.get( "/", ( req, res ) => {

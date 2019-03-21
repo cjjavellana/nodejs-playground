@@ -1,12 +1,12 @@
 
 export class BaseApiService {
 
-    headers(requestId: string, username: string = "", others: object = {}){
-        let defaultHeaders = {
-            'X-User-Id': username,
-            'X-Request-Id': requestId
-        }
+    public headers(requestId: string, username: string = "", others: object = {}) {
+        const defaultHeaders = {
+            "X-Request-Id": requestId,
+            "X-User-Id": username
+        };
 
-        return {...defaultHeaders, ...others}
+        return {...defaultHeaders, ...others};
     }
 }
