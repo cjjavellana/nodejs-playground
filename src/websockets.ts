@@ -1,6 +1,5 @@
 import { Application } from "express";
 import io, { Socket } from "socket.io";
-import WebSocket from "ws";
 
 export const register = (app: Application) => {
     const wss = app.locals.io;

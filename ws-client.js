@@ -1,5 +1,5 @@
 const io = require('socket.io-client')('http://localhost:8080', {
-    reconnection: true
+    transports: ['websocket']
 })
 
 io.on('connect', (connected) => {

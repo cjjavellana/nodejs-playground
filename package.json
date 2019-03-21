@@ -4,9 +4,11 @@
   "description": "A nodejs app demonstrator",
   "main": "dist/app.js",
   "dependencies": {
+    "@types/request": "^2.48.1",
     "@types/socket.io": "^2.1.2",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
+    "requests": "^0.2.2",
     "socket.io": "^2.2.0",
     "ws": "^6.2.0"
   },

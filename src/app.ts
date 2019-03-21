@@ -3,7 +3,8 @@ import express from "express";
 import http from "http";
 import io from "socket.io";
 import WebSocket, { AddressInfo } from "ws";
-import * as wsListener from "./listeners/websockets";
+import * as socketio from "./websockets";
+import * as apiv1 from "./routes/v1";
 
 dotenv.config();
 
@@ -12,9 +13,12 @@ const port = process.env.SERVER_PORT;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-app.locals.io = io(server);
+app.locals.io = io(server, {
+    transports: ["websocket"]
+});
 
-wsListener.register(app);
+socketio.register(app);
+apiv1.register(app)
 
 // define a route handler for the default home page
 app.get( "/", ( req, res ) => {
