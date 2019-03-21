@@ -13,3 +13,8 @@ $ npm install -g nodemon
 ```bash
 $ nodemon app.js
 ```
+
+### Running Test
+```bash
+$ npm run test
+```
