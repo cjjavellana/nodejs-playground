@@ -7,6 +7,7 @@
     "@types/redis": "^2.8.11",
     "@types/request": "^2.48.1",
     "@types/socket.io": "^2.1.2",
+    "body-parser": "^1.18.3",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
     "redis": "^2.8.0",

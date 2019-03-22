@@ -7,12 +7,10 @@ type AuthCallback= (result: any) => any;
 class AuthService extends BaseApiService {
 
     private baseUrl: string;
-    private app: Application;
-
-    constructor(app: Application) {
+    
+    constructor() {
         super();
         this.baseUrl = process.env.AUTH_SERVICE_URL;
-        this.app = app;
     }
 
     public authenticate(requestId: string, username: string, password: string, callback: RequestCallback) {
@@ -27,3 +25,5 @@ class AuthService extends BaseApiService {
     }
 
 }
+
+export const authClient = new AuthService()

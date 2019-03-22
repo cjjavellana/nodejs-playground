@@ -1,4 +1,5 @@
 import { Application, NextFunction, Request, Response } from "express";
+import { authClient } from "../services/auth";
 
 export const register = (app: Application) => {
 
@@ -15,6 +16,8 @@ export const register = (app: Application) => {
     app.post("/api/v1/login", (req: Request, res: Response, _: NextFunction) => {
         const username = req.body.username;
         const pwd = req.body.password;
-
+        authClient.authenticate('111', username, pwd, (error, resp, body) => {
+            console.log('Hello %s', body);
+        })
     });
 };
