@@ -5,9 +5,10 @@ import io from "socket.io";
 import WebSocket, { AddressInfo } from "ws";
 import bodyParser from "body-parser";
 import * as redis from "./redis";
-import * as apiv1 from "./routes/v1";
+import * as apiv1 from "./routes/v1/auth";
 import * as socketio from "./websockets";
 import * as mocks from "./routes/mocks/mocks";
+import * as parsers from "./parsers";
 
 dotenv.config();
 
@@ -16,11 +17,7 @@ const port = process.env.SERVER_PORT;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-// parse application/json
-app.use(bodyParser.json());
-
+parsers.register(app);
 app.locals.io = io(server);
 socketio.register(app);
 apiv1.register(app);

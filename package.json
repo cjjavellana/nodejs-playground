@@ -4,15 +4,19 @@
   "description": "A nodejs app demonstrator",
   "main": "dist/app.js",
   "dependencies": {
+    "@types/express-jwt": "0.0.42",
     "@types/redis": "^2.8.11",
     "@types/request": "^2.48.1",
     "@types/socket.io": "^2.1.2",
+    "@types/uuid": "^3.4.4",
     "body-parser": "^1.18.3",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
+    "express-jwt": "^5.3.1",
     "redis": "^2.8.0",
     "requests": "^0.2.2",
     "socket.io": "^2.2.0",
+    "uuid": "^3.3.2",
     "ws": "^6.2.0"
   },
   "devDependencies": {
