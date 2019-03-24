@@ -3,8 +3,6 @@ import path from "path";
 import { promisify } from "util";
 import jwt from "jsonwebtoken";
 
-type SetFileContent = (fileContent: string) => any;
-
 export class Jwt {
 
     private privateKey: string;
