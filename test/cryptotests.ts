@@ -9,4 +9,21 @@ describe('Jwt Crypto Tests', () => {
             assert(j.getPublicKey() != undefined)
         });
     })
+
+    it("It can generate secure tokens", () => {
+        Jwt.build().then((j: Jwt) => {
+            let token = j.generateToken('cjavellana')
+            console.log("Token %s", token)
+            assert(token != undefined)
+        });
+    })
+
+    it("It can decrypt a secure token", () => {
+        Jwt.build().then((j: Jwt) => {
+            let token = j.generateToken('cjavellana')
+            let verifiedToken = j.verify(token)
+            console.log(verifiedToken)
+            assert(verifiedToken != undefined)
+        });
+    });
 });

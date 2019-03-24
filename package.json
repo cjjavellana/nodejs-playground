@@ -5,6 +5,7 @@
   "main": "dist/app.js",
   "dependencies": {
     "@types/express-jwt": "0.0.42",
+    "@types/jsonwebtoken": "^8.3.2",
     "@types/redis": "^2.8.11",
     "@types/request": "^2.48.1",
     "@types/socket.io": "^2.1.2",

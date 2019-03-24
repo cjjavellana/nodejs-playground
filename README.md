@@ -34,3 +34,11 @@ $ npm run test
 ```
 $ docker-compose up -d redis mock
 ```
+
+### Generating keys for RS256
+```bash
+# Generating private key. Dont put passphrase
+$ ssh-keygen -t rsa -b 1024 -m PEM -f jwtRS256.key
+# Creating public key
+$ openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
+```
