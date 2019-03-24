@@ -1,5 +1,4 @@
 import { Application, NextFunction, Request, Response } from "express";
-import { authClient } from "../services/auth";
 
 export const register = (app: Application) => {
 

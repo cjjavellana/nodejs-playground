@@ -18,7 +18,17 @@ $ nodemon app.js
 $ npm run test
 ```
 
+## Dependencies
+1. Downstream Mocks
+
+ ...Mock service for downstream services..
+ ...Exposed through port 9090 (see docker-compose.yml)
+
+2. Redis
+
+ ...Exposed through redis default port 6379 (see docker-compose.yml).
+
 ### Starting Dependencies
 ```
-$ docker-compose up -d redis
+$ docker-compose up -d redis mock
 ```

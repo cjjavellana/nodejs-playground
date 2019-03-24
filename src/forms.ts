@@ -1,23 +1,29 @@
 import { Request } from "express";
 import uuidv4 from "uuid/v4";
 
-export class AbstractRequestForm {
+/**
+ * Provides common functions for obtaining common values from the request
+ */
+export class BaseRequestForm {
     private req: Request;
 
     constructor(req: Request) {
         this.req = req;
     }
 
-    getRequestId(): string {
-        let requestId = this.req.header('X-Request-Id')
-        if(requestId) return requestId;
-        else return uuidv4();
+    public getRequestId(): string {
+        const requestId = this.req.header("X-Request-Id");
+        if (requestId) {
+            return requestId;
+        } else {
+            return uuidv4();
+        }
     }
 }
 
-export class LoginRequest extends AbstractRequestForm {
-    username: string;
-    password: string;
+export class LoginRequest extends BaseRequestForm {
+    public username: string;
+    public password: string;
 
     constructor(req: Request, username: string, password: string) {
         super(req);

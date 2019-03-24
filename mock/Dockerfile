@@ -11,7 +11,8 @@ COPY .env /app
 COPY src /app/src
 
 RUN npm install && \
-npm run build 
+npm run build && \
+npm prune --only=production
 
 EXPOSE 9090
 

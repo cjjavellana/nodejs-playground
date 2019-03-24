@@ -1,14 +1,14 @@
+import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import express from "express";
 import http from "http";
 import io from "socket.io";
 import WebSocket, { AddressInfo } from "ws";
-import bodyParser from "body-parser";
+import * as parsers from "./parsers";
 import * as redis from "./redis";
+import * as mocks from "./routes/mocks/mocks";
 import * as apiv1 from "./routes/v1/auth";
 import * as socketio from "./websockets";
-import * as mocks from "./routes/mocks/mocks";
-import * as parsers from "./parsers";
 
 dotenv.config();
 
