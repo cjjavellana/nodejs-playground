@@ -1,74 +1,85 @@
+import { Application } from "express-serve-static-core";
 import fs from "fs";
+import jwt from "jsonwebtoken";
 import path from "path";
 import { promisify } from "util";
-import jwt from "jsonwebtoken";
 
 export class Jwt {
 
+    public static async build(): Promise<Jwt> {
+        if (!this.myInstance) {
+            const priv = await this.loadFileToBuffer(path.join(__dirname, "..", "jwtRS256.key"));
+            const pub = await this.loadFileToBuffer(path.join(__dirname, "..", "jwtRS256.key.pub"));
+            this.myInstance =  new Jwt(priv, pub);
+        }
+
+        return this.myInstance;
+    }
+    private static myInstance: Jwt;
+
+    private static loadFileToBuffer(keyPath: string): Promise<string> {
+        const readFileAsync = promisify(fs.readFile);
+        return readFileAsync(keyPath)
+                .then((v: Buffer) => {
+                    return v.toString();
+                });
+    }
     private privateKey: string;
     private publicKey: string;
-    
-    private constructor(priv: string, pub: string){
+
+    private constructor(priv: string, pub: string) {
         this.privateKey = priv;
         this.publicKey = pub;
     }
 
-    getPrivateKey(): string {
-        return this.privateKey
+    public getPrivateKey(): string {
+        return this.privateKey;
     }
 
-    getPublicKey(): string {
-        return this.publicKey
+    public getPublicKey(): string {
+        return this.publicKey;
     }
 
-    generateToken(username: string): string {
-        let signOptions = this.signOptions(username)
-        let payload = this.payload(username)
-        return jwt.sign(payload, this.getPrivateKey(), signOptions)
+    public generateToken(username: string): string {
+        const signOptions = this.signOptions(username);
+        const payload = this.payload(username);
+        return jwt.sign(payload, this.getPrivateKey(), signOptions);
     }
 
-    // ~ 
+    // ~
 
-    verify(token: string): any {
-        return jwt.verify(token, this.publicKey, this.verifyOptions())
+    public verify(token: string): any {
+        return jwt.verify(token, this.publicKey, this.verifyOptions());
     }
 
     private payload(username: string): any {
         return {
-            username: username
-        }
+            username
+        };
     }
 
     private signOptions(username: string): jwt.SignOptions {
         return {
-            issuer:  "Cjavellana",
-            subject:  username,
+            algorithm:  "RS256",
             audience:  "https://cjavellana.me",
             expiresIn:  "12h",
-            algorithm:  "RS256"
+            issuer:  "Cjavellana",
+            subject:  username
            };
     }
 
-    private verifyOptions() : jwt.VerifyOptions {
+    private verifyOptions(): jwt.VerifyOptions {
         return {
-            issuer:  "Cjavellana",
+            algorithms:  ["RS256"],
             audience:  "https://cjavellana.me",
             clockTolerance: 60,
-            algorithms:  ["RS256"]
-        }
-    }
-
-    private static loadFileToBuffer(keyPath: string): Promise<string> {
-        let readFileAsync = promisify(fs.readFile)
-        return readFileAsync(keyPath)
-                .then((v: Buffer) => { 
-                    return v.toString();
-                });
-    }
-
-    static async build(): Promise<Jwt> {
-        let priv = await this.loadFileToBuffer(path.join(__dirname, "..", "jwtRS256.key"))
-        let pub = await this.loadFileToBuffer(path.join(__dirname, "..", "jwtRS256.key.pub"))
-        return new Jwt(priv, pub);
+            issuer:  "Cjavellana"
+        };
     }
 }
+
+export const register = (app: Application) => {
+    Jwt.build().then((j: Jwt) => {
+        app.locals.jwt = j;
+    });
+};

@@ -4,6 +4,7 @@ import express from "express";
 import http from "http";
 import io from "socket.io";
 import WebSocket, { AddressInfo } from "ws";
+import * as crypto from "./crypto";
 import * as parsers from "./parsers";
 import * as redis from "./redis";
 import * as mocks from "./routes/mocks/mocks";
@@ -13,15 +14,15 @@ import * as socketio from "./websockets";
 dotenv.config();
 
 const app = express();
-const port = process.env.SERVER_PORT;
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+
+app.locals.io = io(server);
 
 parsers.register(app);
-app.locals.io = io(server);
 socketio.register(app);
 apiv1.register(app);
 redis.register(app);
+crypto.register(app);
 
 // only on dev mode - exclude this in production build
 mocks.register(app);

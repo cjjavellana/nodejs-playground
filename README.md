@@ -42,3 +42,9 @@ $ ssh-keygen -t rsa -b 1024 -m PEM -f jwtRS256.key
 # Creating public key
 $ openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
 ```
+
+### Test Requests
+Authentication
+```bash
+$ curl -X POST -H 'Content-Type: application/json' -v http://localhost:8080/api/v1/login -d '{"username": "aaa", "password": "test"}'
+```
