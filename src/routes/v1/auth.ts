@@ -13,7 +13,7 @@ export const register = (app: Application) => {
     /**
      * Accepts a username & password delegates call to an auth service
      */
-    app.post("/api/v1/login", (req: Request, res: Response, _: NextFunction) => {
+    app.post("/api/v1/login", (req: Request, res: Response, next: NextFunction) => {
         const username = req.body.username;
         const pwd = req.body.password;
 

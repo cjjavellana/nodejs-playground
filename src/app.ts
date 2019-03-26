@@ -5,6 +5,7 @@ import http from "http";
 import io from "socket.io";
 import WebSocket, { AddressInfo } from "ws";
 import * as crypto from "./crypto";
+import * as filters from "./middleware";
 import * as parsers from "./parsers";
 import * as redis from "./redis";
 import * as mocks from "./routes/mocks/mocks";
@@ -18,6 +19,7 @@ const server = http.createServer(app);
 
 app.locals.io = io(server);
 
+filters.register(app);
 parsers.register(app);
 socketio.register(app);
 apiv1.register(app);
