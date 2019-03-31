@@ -10,6 +10,10 @@ io.on('message', (message) => {
     console.log("Message %s", message)
 })
 
+io.on('OnUploadCompleteEvent', (message) => {
+    console.log("OnUploadCompleteEvent %s", message)
+})
+
 io.on('disconnect', (reason) => {
     console.log("Disconnected %s", reason)
 });
