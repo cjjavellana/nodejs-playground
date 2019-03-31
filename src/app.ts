@@ -5,7 +5,9 @@ import http from "http";
 import io from "socket.io";
 import WebSocket, { AddressInfo } from "ws";
 import * as crypto from "./crypto";
+import * as events from "./emitters";
 import * as filters from "./middleware";
+import * as notifications from "./notifications";
 import * as parsers from "./parsers";
 import * as redis from "./redis";
 import * as mocks from "./routes/mocks/mocks";
@@ -19,12 +21,14 @@ const server = http.createServer(app);
 
 app.locals.io = io(server);
 
+events.register(app);
 filters.register(app);
 parsers.register(app);
 socketio.register(app);
 apiv1.register(app);
 redis.register(app);
 crypto.register(app);
+notifications.register(app);
 
 // only on dev mode - exclude this in production build
 mocks.register(app);
