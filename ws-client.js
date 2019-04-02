@@ -1,9 +1,13 @@
-const io = require('socket.io-client')('http://localhost:8080', {
+const io = require('socket.io-client')('http://localhost:8080?user=cjavellana', {
     transports: ['websocket']
 })
 
 io.on('connect', (connected) => {
-    console.log("Connected %s", connected)
+    console.log("WebSocket Connected")
+
+    io.emit('authenticate', JSON.stringify({
+        'token': 'bbb'
+    }));
 });
 
 io.on('message', (message) => {

@@ -4,6 +4,7 @@ import express from "express";
 import http from "http";
 import io from "socket.io";
 import WebSocket, { AddressInfo } from "ws";
+import * as amqp from "./amqp";
 import * as crypto from "./crypto";
 import * as events from "./emitters";
 import * as filters from "./middleware";
@@ -22,6 +23,7 @@ const server = http.createServer(app);
 app.locals.io = io(server);
 
 events.register(app);
+amqp.register(app);
 filters.register(app);
 parsers.register(app);
 socketio.register(app);

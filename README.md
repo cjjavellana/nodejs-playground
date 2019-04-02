@@ -75,7 +75,7 @@ $ npm run test
 
 ### Starting Dependencies
 ```
-$ docker-compose up -d redis mock
+$ docker-compose up -d redis mock rabbitmq
 ```
 
 ### Generating keys for RS256
