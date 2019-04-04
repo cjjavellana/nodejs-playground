@@ -1,89 +1,67 @@
-import amqp, { Channel, Connection, ConsumeMessage, Options, Replies } from "amqplib";
+import amqp, { AmqpConnectionManager, ChannelWrapper, SetupFunc } from "amqp-connection-manager";
+import { ConfirmChannel, ConsumeMessage } from "amqplib";
 import { EventEmitter } from "events";
 import { Application } from "express";
 import os from "os";
 
 export const register = (app: Application) => {
+    const eventEmitter:EventEmitter = app.locals.eventEmitter;
+    const msgHandlers = new AmqpMessageHandlers(app);
 
-    RabbitMQClient.build().then((mqClient: RabbitMQClient) => {
-        const messagingHandler = new AMQPMessageHandler(mqClient, app);
-        messagingHandler.registerPriceResponseHandler();
-    });
+    RabbitMQClient.connect(this.setupFunc)
+        .then((conn: amqp.AmqpConnectionManager) => {
+            const channelName = os.hostname() + "-channel";
+            return conn.createChannel({
+                json: true,
+                name: channelName,
+                setup: setupFunc
+            });
+        });
 
+    /**
+     * Called everytime amqplib reconnects to the broker.
+     * @param channel
+     */
+    const setupFunc = (channel: ConfirmChannel) => {
+        const pxRespQueue = os.hostname() + ".pricing.response.queue";
+        channel.assertExchange("pricing.exchange", "direct", { durable: true });
+        channel.assertQueue(pxRespQueue, { exclusive: false, durable: false });
+        channel.bindQueue(pxRespQueue, "pricing.exchange", "pricing.response");
+        channel.consume(pxRespQueue, msgHandlers.pxResponseHandler);
+
+        eventEmitter.on('priceRequest', (args: any[]) => {
+            
+        })
+    };
+
+    
 };
 
-export class AMQPMessageHandler {
+export class AmqpMessageHandlers {
 
-    private mqClient: RabbitMQClient;
     private app: Application;
-    private mqChannel: Channel;
 
-    constructor(mqClient: RabbitMQClient, app: Application) {
-        this.mqClient = mqClient;
+    constructor(app: Application) {
         this.app = app;
-        this.mqChannel = mqClient.getChannel();
     }
 
-    public registerPriceResponseHandler() {
-        const priceResponseQueueName = os.hostname() + ".pricing.response.queue";
-        this.mqClient.createExchange("pricing.exchange", "direct");
-        this.mqClient.createQueue(priceResponseQueueName, { durable: true, exclusive: true })
-            .then((q: Replies.AssertQueue) => {
-                this.mqChannel.bindQueue(q.queue, "pricing.exchange", "pricing.response.queue");
-                this.mqChannel.consume(q.queue, this.priceResponseMessageConsumer);
-            });
-    }
-
-    private priceResponseMessageConsumer(msg: ConsumeMessage) {
+    public pxResponseHandler(msg: ConsumeMessage) {
         console.log(msg.content.toString());
     }
+
+    // add more handlers message handlers here
+    // need to broadcast message through socketio? 
+    // emit event instead using app.locals.eventEmitter
 }
 
 export class RabbitMQClient {
 
-    public static async build(): Promise<RabbitMQClient> {
-        if (this.myInstance === undefined) {
-            const conn = await this.connect();
-            const ch = await this.initializeChannel(conn);
-            this.myInstance = new RabbitMQClient(conn, ch);
-            return this.myInstance;
-        }
-
-        return this.myInstance;
+    public static async connect(setupFunc: SetupFunc): Promise<amqp.AmqpConnectionManager> {
+        const conn = await this.internalConnect();
+        return conn;
     }
 
-    private static myInstance: RabbitMQClient;
-
-    private static async connect(): Promise<Connection> {
-        return await amqp.connect({
-            hostname: process.env.RABBITMQ_HOSTNAME,
-            password: process.env.RABBITMQ_PASSWORD,
-            port: Number(process.env.RABBITMQ_PORT),
-            username: process.env.RABBITMQ_USERNAME
-        });
-    }
-
-    private static async initializeChannel(conn: Connection) {
-        return await conn.createChannel();
-    }
-
-    private conn: Connection;
-    private ch: Channel;
-
-    private constructor(conn: Connection, ch: Channel) {
-        this.conn = conn;
-        this.ch = ch;
-    }
-
-    public async createExchange(name: string, type: string): Promise<Replies.AssertExchange> {
-        return this.ch.assertExchange(name, type, { durable: true });
-    }
-
-    public async createQueue(name: string, options?: Options.AssertQueue): Promise<Replies.AssertQueue> {
-        return this.ch.assertQueue(name, options);
-    }
-
-    public getChannel(): Channel {
-        return this.ch;
+    private static internalConnect(): amqp.AmqpConnectionManager {
+        return amqp.connect([process.env.RABBITMQ_URL]);
     }
 }

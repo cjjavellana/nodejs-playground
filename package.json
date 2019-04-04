@@ -4,6 +4,7 @@
   "description": "A nodejs app demonstrator",
   "main": "dist/app.js",
   "dependencies": {
+    "@types/amqp-connection-manager": "^2.0.2",
     "@types/amqplib": "^0.5.11",
     "@types/express-jwt": "0.0.42",
     "@types/jsonwebtoken": "^8.3.2",
@@ -11,6 +12,7 @@
     "@types/request": "^2.48.1",
     "@types/socket.io": "^2.1.2",
     "@types/uuid": "^3.4.4",
+    "amqp-connection-manager": "^2.3.1",
     "amqplib": "^0.5.3",
     "body-parser": "^1.18.3",
     "bunyan": "^1.8.12",
