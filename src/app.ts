@@ -7,8 +7,7 @@ import { AddressInfo } from "ws";
 import * as amqp from "./amqp";
 import * as crypto from "./crypto";
 import * as eventEmitter from "./emitters";
-import * as ioMiddleware from "./iomiddleware";
-import * as filters from "./middleware";
+import * as middleware from "./middleware";
 import * as notifications from "./notifications";
 import * as parsers from "./parsers";
 import * as redis from "./redis";
@@ -25,14 +24,13 @@ app.locals.io = io(server);
 
 eventEmitter.register(app);
 amqp.register(app);
-filters.register(app);
+middleware.register(app);
 parsers.register(app);
 apiv1.register(app);
 redis.register(app);
 crypto.register(app);
 notifications.register(app);
 socketio.register(app);
-ioMiddleware.register(app);
 // only on dev mode - exclude this in production build
 mocks.register(app);
 
