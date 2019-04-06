@@ -12,12 +12,7 @@ export class BaseRequestForm {
     }
 
     public getRequestId(): string {
-        const requestId = this.req.header("X-Request-Id");
-        if (requestId) {
-            return requestId;
-        } else {
-            return uuidv4();
-        }
+        return this.req.header("X-Request-Id") || uuidv4();
     }
 }
 

@@ -52,7 +52,7 @@ export class AmqpMessageHandlers {
 
     // add more message handlers here
     // need to broadcast message through socketio?
-    // emit event instead using app.locals.eventEmitter
+    // emit event instead - using app.locals.eventEmitter
 }
 
 export class RabbitMQClient {
