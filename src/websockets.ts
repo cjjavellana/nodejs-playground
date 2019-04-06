@@ -1,7 +1,7 @@
 import events, { EventEmitter } from "events";
 import { Application } from "express";
 import { RedisClient } from "redis";
-import io, { Socket } from "socket.io";
+import io, { Packet, Socket } from "socket.io";
 import uuid = require("uuid");
 import { Jwt } from "./crypto";
 import { Authority, AuthToken, Group, Metrics, Permission, User } from "./data";
@@ -21,32 +21,88 @@ export const register = (app: Application) => {
     const socketAuthenticator = new SocketTokenAuthenticator(app);
 
     // ~ default namespace
-
-    ws.on("connection", (socket: Socket) => {
-        socket.on("authenticate", (token: AuthToken) => {
-            socketAuthenticator.onAuthenticate(socket, token);
-        });
+    const defaultNs = new NameSpace(app, ws);
+    defaultNs.on("authenticate", (socket: Socket, token: AuthToken) => {
+        socketAuthenticator.onAuthenticate(socket, token);
     });
+    defaultNs.build();
 
     /**
      * Subscribe to 'OnUploadCompleteEvent' event to broadcast the message through
      * websockets
      */
     eventEmitter.on("OnUploadCompleteEvent", (message: string) => {
-        ws.emit("OnUploadCompleteEvent", message);
+        defaultNs.emit("OnUploadCompleteEvent", message);
     });
 
     // ~ admin namespace
-    const adminNsp = ws.of("/admin");
-    adminNsp.on("connection", (socket: Socket) => {
+    const adminNs = new NameSpace(app, ws, "/admin");
+    adminNs.registerOnConnectFunction((socket: Socket) => {
         console.log("someone connected");
         socket.send("/admin someone connected");
     });
+    adminNs.build();
 
     eventEmitter.on("systemUtilization", (metrics: Metrics) => {
-        adminNsp.emit("systemUtilization", metrics);
+        adminNs.emit("systemUtilization", metrics);
     });
 };
+
+class WsFunctionEventType {
+    public eventName: string;
+    public listener: (socket: Socket, args: any) => void;
+
+    constructor(eventName: string, listener: (socket: Socket, args: any) => void) {
+        this.eventName = eventName;
+        this.listener = listener;
+    }
+}
+
+class NameSpace {
+
+    private nsp: io.Server | io.Namespace;
+    private app: Application;
+    private listeners = new Map<string, (socket: Socket, args: any) => any>();
+    private onConnectFunctions: Array<(socket: Socket) => void> = new Array();
+
+    constructor(app: Application, ws: io.Server, namespace?: string) {
+        this.app = app;
+        this.nsp = (namespace) ? ws.of(namespace) : ws;
+    }
+
+    public on(eventName: string, listener: (socket: Socket, args: any) => any) {
+        this.listeners.set(eventName, listener);
+    }
+
+    public registerOnConnectFunction(func: (socket: Socket) => void) {
+        this.onConnectFunctions.push(func);
+    }
+
+    public emit(event: string, args: any) {
+        this.nsp.emit(event, args);
+    }
+
+    public build() {
+        this.nsp.on("connection", (socket: Socket) => this.registerHandlers(socket));
+    }
+
+    protected registerHandlers(socket: Socket) {
+        socket.use((packet: Packet, next) => {
+            console.log(packet);
+            next();
+        });
+
+        for (const [key, value] of this.listeners) {
+            socket.on(key, (args: any) => {
+                value(socket, args);
+            });
+        }
+
+        for (const onConnectFunction of this.onConnectFunctions) {
+            onConnectFunction(socket);
+        }
+    }
+}
 
 class SocketTokenAuthenticator {
 

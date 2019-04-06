@@ -31,7 +31,7 @@ redis.register(app);
 crypto.register(app);
 notifications.register(app);
 socketio.register(app);
-
+filters.registerSocketMiddleware(app);
 // only on dev mode - exclude this in production build
 mocks.register(app);
 
