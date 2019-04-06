@@ -1,14 +1,19 @@
 import { Application, NextFunction, Request, Response } from "express";
+import uuid = require("uuid");
 
 export const register = (app: Application) => {
     app.use(aroundAdvice);
 };
 
 const aroundAdvice = (req: Request, resp: Response, next: NextFunction) => {
-    console.log("Starting Request %s", req.url);
+    const requestStartTime = Date.now();
+    const requestId = req.headers["X-Request-Id"] || uuid.v4();
+
+    console.log("[Request Start] %s %s", requestId, req.url);
 
     resp.on("finish", () => {
-        console.log("Request Completed %s", req.url);
+        const elapsedTimeInMillis = Date.now() - requestStartTime;
+        console.log("[Request End] %s %sms", requestId, elapsedTimeInMillis);
     });
 
     next();

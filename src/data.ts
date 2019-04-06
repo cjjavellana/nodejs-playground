@@ -44,8 +44,8 @@ export enum Authority {
 }
 
 export class Metrics {
-    metrics: string;
-    periodStart: Date;
-    periodEnd: Date;
-    value: Number
+    public metrics: string;
+    public periodStart: Date;
+    public periodEnd: Date;
+    public value: number;
 }

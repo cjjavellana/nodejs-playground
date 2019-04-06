@@ -4,15 +4,15 @@ import { RedisClient } from "redis";
 import io, { Socket } from "socket.io";
 import uuid = require("uuid");
 import { Jwt } from "./crypto";
-import { Authority, AuthToken, Group, Permission, User, Metrics } from "./data";
+import { Authority, AuthToken, Group, Metrics, Permission, User } from "./data";
 
 /**
  * The main module handling websocket communication.
- * 
+ *
  * Dependencies
  * ================
  * 1. Must be initialized after redis
- * 
+ *
  * @param app
  */
 export const register = (app: Application) => {
@@ -65,7 +65,7 @@ class SocketTokenAuthenticator {
 
         if (this.validate(token)) {
             console.log("Setting %s %s", socket.id, token.requestId);
-            let userGroups = this.obtainUser().groups
+            const userGroups = this.obtainUser().groups;
             userGroups.forEach((g) => this.askClientToConnectToSecGroupNamespace(socket, g.name));
             this.sendDisclaimer(socket);
         } else {
@@ -92,7 +92,7 @@ Use of this server is monitored for security purposes.`
         const oneTimeToken = this.oneTimeToken();
         this.storeOneTimeTokenToCache(socket.id, this.oneTimeToken());
         socket.emit("connectToNsp", {
-            namespace: namespace,
+            namespace,
             token: oneTimeToken
         });
     }
