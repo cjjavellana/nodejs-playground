@@ -1,5 +1,12 @@
-# Simple NodeJS 
-A playground for demonstrating REST API & Websockets
+# NodeJS Playground
+
+A playground for experimenting with:
+
+1. REST routes
+
+2. JWT Authentication & Validation
+
+3. Websocket (Socket.IO) Channel
 
 ## The app.locals
 This section describes the services made available through ```app.locals```
@@ -13,12 +20,70 @@ This section describes the services made available through ```app.locals```
 
 4. app.locals.jwt - The Jwt service instance. Used for encrypting & decrypting security token.
 
-## Events
+## REST API
+
+## Websockets
+
+### Establishing connection through websockets
+
+To connect to the application's websockets channel, emit an ```authenticate``` event passing a random request id and the token obtained by a previous call to ```/api/v1/login```
+
+In client
+```javascript
+const uuid = require('uuid')
+const io = require('socket.io-client')('http://localhost:8080?user=foobar', {
+    transports: ['websocket']
+})
+
+io.on('connect', (connected) => {
+    io.emit('authenticate', {
+        'requestId': uuid.v4(),
+        'token': 'bbb'
+    });
+});
+```
+Where ```token``` is the token returned by a call to ```/api/v1/login```
+
+After token is verified, the server will emit a ```connectToNsp``` event instructing the client to subscribe to security group namespaces.
+
+```javascript
+nsp = {}
+io.on('connectToNsp', (message) => {
+    let nsp = require('socket.io-client')('http://localhost:8080' + message.namespace, {
+        transports: ['websocket']
+    });
+
+    nsp.on('message', (m) => {
+        console.log(m)
+    })
+
+    nsp[message.namespace] = nsp;
+})
+```
+
+### Supported Namespaces & Their Corresponding Events
+
+#### /admin namespace
+A namespace for admin users
+
+1. ```systemUtilization``` - An event fired every 5 seconds to broadcast system related metrics
+
+Subscribing to ```systemUtilization``` event.
+```javascript
+nsp.on('systemUtilization', (metrics: Metrics) => {
+    // handle broadcasted message
+})
+```
+
+## /trader namespace
+A namespace for trader users
+
+## Internal Events
 This section describes the events dispatched internally which can be subscribed to
 
 1. OnUploadCompleteEvent
    
-   The time it takes to process an uploaded file varies as a function of the contents of the file being processed. In addition to that, http requests are only allowed to remain open for 30-60 sec depending on your k8's configuration.
+   The time it takes to process an uploaded file varies as a function of the contents of the file being processed. In addition to that, http requests in k8 is open for 30-60 sec before it's terminated by the cluster's HAProxy.
 
    To address the above mentioned issues without resorting to long polling, we make use of redis as the medium of communication between this service and the downstream processor. This service subscribes to a redis channel ```OnUploadCompleteEvent``` and internally rebroadcasts the messages it receives through ```events.EventEmitter```.
 
@@ -42,6 +107,14 @@ This section describes the events dispatched internally which can be subscribed 
     eventEmitter.on("OnUploadCompleteEvent", (message: string) => {
         ioServer.emit("OnUploadCompleteEvent", message);
     });
+   ```
+   
+   In ```client.js```
+
+   ```javascript
+   io.on('OnUploadCompleteEvent', (message) => {
+       // handle message 
+   })
    ```
 
 ### Prerequisites

@@ -5,7 +5,7 @@ import { Application } from "express";
 import os from "os";
 
 export const register = (app: Application) => {
-    const eventEmitter:EventEmitter = app.locals.eventEmitter;
+    const eventEmitter: EventEmitter = app.locals.eventEmitter;
     const msgHandlers = new AmqpMessageHandlers(app);
 
     RabbitMQClient.connect(this.setupFunc)
@@ -29,28 +29,29 @@ export const register = (app: Application) => {
         channel.bindQueue(pxRespQueue, "pricing.exchange", "pricing.response");
         channel.consume(pxRespQueue, msgHandlers.pxResponseHandler);
 
-        eventEmitter.on('priceRequest', (args: any[]) => {
-            
-        })
+        eventEmitter.on("priceRequest", (args: any[]) => {
+            console.log(args);
+        });
     };
 
-    
 };
 
 export class AmqpMessageHandlers {
 
     private app: Application;
+    private eventEmitter: EventEmitter;
 
     constructor(app: Application) {
         this.app = app;
+        this.eventEmitter = app.locals.eventEmitter;
     }
 
     public pxResponseHandler(msg: ConsumeMessage) {
         console.log(msg.content.toString());
     }
 
-    // add more handlers message handlers here
-    // need to broadcast message through socketio? 
+    // add more message handlers here
+    // need to broadcast message through socketio?
     // emit event instead using app.locals.eventEmitter
 }
 

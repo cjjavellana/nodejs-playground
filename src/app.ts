@@ -26,11 +26,11 @@ events.register(app);
 amqp.register(app);
 filters.register(app);
 parsers.register(app);
-socketio.register(app);
 apiv1.register(app);
 redis.register(app);
 crypto.register(app);
 notifications.register(app);
+socketio.register(app);
 
 // only on dev mode - exclude this in production build
 mocks.register(app);
