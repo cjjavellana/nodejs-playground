@@ -1,5 +1,4 @@
 import { Application, NextFunction, Request, Response } from "express";
-import io, { Socket } from "socket.io";
 import uuid from "uuid";
 
 export const register = (app: Application) => {
@@ -18,12 +17,4 @@ const aroundAdvice = (req: Request, resp: Response, next: NextFunction) => {
     });
 
     next();
-};
-
-export const registerSocketMiddleware = (app: Application) => {
-    const ioServer: io.Server = app.locals.io;
-    ioServer.use((socket: Socket, next) => {
-        console.log(socket);
-        next();
-    });
 };
