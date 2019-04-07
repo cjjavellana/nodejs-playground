@@ -9,7 +9,7 @@ io.on('connect', (connected) => {
     console.log("WebSocket Connected")
 
     io.emit('authenticate', {
-        'requestId': uuid.v4(),
+        'correlationId': uuid.v4(),
         'token': 'bbb'
     });
 });

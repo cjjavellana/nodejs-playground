@@ -4,7 +4,10 @@ import { RedisClient } from "redis";
 import io, { Packet, Socket } from "socket.io";
 import uuid = require("uuid");
 import { Jwt } from "./crypto";
-import { Authority, AuthToken, Group, Metrics, Permission, User } from "./data";
+import {
+    Authority, AuthToken, Group, IncomingWebSocketMessage,
+    Metrics, OutGoingWebSocketMessage, Permission, User
+} from "./data";
 
 /**
  * The main module handling websocket communication.
@@ -37,7 +40,7 @@ export const register = (app: Application) => {
 
     // ~ admin namespace
     const adminNs = new NameSpace(app, ws, "/admin");
-    adminNs.registerOnConnectFunction((socket: Socket) => {
+    adminNs.onConnect((socket: Socket) => {
         console.log("someone connected");
         socket.send("/admin someone connected");
     });
@@ -63,7 +66,7 @@ class NameSpace {
     private nsp: io.Server | io.Namespace;
     private app: Application;
     private listeners = new Map<string, (socket: Socket, args: any) => any>();
-    private onConnectFunctions: Array<(socket: Socket) => void> = new Array();
+    private onConnectHandlers: Array<(socket: Socket) => void> = new Array();
 
     constructor(app: Application, ws: io.Server, namespace?: string) {
         this.app = app;
@@ -74,8 +77,13 @@ class NameSpace {
         this.listeners.set(eventName, listener);
     }
 
-    public registerOnConnectFunction(func: (socket: Socket) => void) {
-        this.onConnectFunctions.push(func);
+    public onConnect(func: (socket: Socket) => void) {
+        this.onConnectHandlers.push(func);
+    }
+
+    public send(message: OutGoingWebSocketMessage) {
+        console.log("[WsOUT Message] %s", message.correlationId);
+        this.nsp.send(message.args());
     }
 
     public emit(event: string, args: any) {
@@ -87,19 +95,71 @@ class NameSpace {
     }
 
     protected registerHandlers(socket: Socket) {
+        this.registerPerRequestAdvice(socket);
+        this.registerEventHandlers(socket);
+        this.registerRunOnConnectHandlers(socket);
+    }
+
+    protected registerPerRequestAdvice(socket: Socket) {
         socket.use((packet: Packet, next) => {
-            console.log(packet);
+            this.logMessage(packet);
             next();
         });
+    }
 
+    // TODO: Include Username in the log
+    protected logMessage(packet: Packet) {
+        const payload = this.payload(packet);
+        if (this.isIncomingWebSocketMessage(payload)) {
+            // [WsIN] foobar authenticate xxxx-xxxx-xxxx-xxxx
+            const message = payload as IncomingWebSocketMessage;
+            console.log("[WsIN] %s %s %s", "foobar", message.event, message.correlationId);
+        } else {
+            // be careful with this, if sensitive messages does not deserialize to
+            // IncomingWebSocketMessage it could end up being logged
+            const user = "foobar";
+            const messageAsTuple = payload as [string, any];
+            const event = messageAsTuple[0];
+            const messageBody = messageAsTuple[1];
+            try {
+                // is it a json payload?
+                const jsonPayload = JSON.stringify(messageBody);
+                console.log("[WARN][WsIN] %s %s %s", user, event, jsonPayload);
+            } catch (error) {
+                console.log("[WARN][WsIN] %s %s %s", user, event, payload);
+            }
+        }
+    }
+
+    protected payload(packet: Packet): IncomingWebSocketMessage | [string, any] {
+        const event = packet[0];
+        const payload = packet[1];
+
+        try {
+            const message = payload as IncomingWebSocketMessage;
+            message.event = event;
+            return message;
+        } catch (error) {
+            console.log("Failed to deserialize \"%s\" to IncomingWebSocketMessage", payload);
+            return [event, payload];
+        }
+    }
+
+    protected isIncomingWebSocketMessage(obj: any): boolean {
+        return typeof obj.correlationId === "string";
+    }
+
+    protected registerEventHandlers(socket: Socket) {
         for (const [key, value] of this.listeners) {
             socket.on(key, (args: any) => {
                 value(socket, args);
             });
         }
+    }
 
-        for (const onConnectFunction of this.onConnectFunctions) {
-            onConnectFunction(socket);
+    protected registerRunOnConnectHandlers(socket: Socket) {
+        for (const handler of this.onConnectHandlers) {
+            handler(socket);
         }
     }
 }
@@ -117,10 +177,10 @@ class SocketTokenAuthenticator {
     }
 
     public onAuthenticate(socket: Socket, token: AuthToken) {
-        console.log("Socket auth event: %s", token.requestId);
+        console.log("Socket auth event: %s", token.correlationId);
 
         if (this.validate(token)) {
-            console.log("Setting %s %s", socket.id, token.requestId);
+            console.log("Setting %s %s", socket.id, token.correlationId);
             const userGroups = this.obtainUser().groups;
             userGroups.forEach((g) => this.askClientToConnectToSecGroupNamespace(socket, g.name));
             this.sendDisclaimer(socket);

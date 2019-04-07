@@ -1,9 +1,24 @@
 
-export class WebSocketRequest {
-    public requestId: string;
+export class WebSocketMessage {
+
+    /**
+     * A correlation id may originate from the client when used
+     * in websocket request-response mode or may originate deep
+     * within a downstream service when used in event broadcast
+     * mode.
+     */
+    public correlationId: string;
 }
 
-export class AuthToken extends WebSocketRequest {
+export abstract class OutGoingWebSocketMessage extends WebSocketMessage {
+    public abstract args(): any;
+}
+
+export class IncomingWebSocketMessage extends WebSocketMessage {
+    public event: string;
+}
+
+export class AuthToken extends IncomingWebSocketMessage {
     public token: string;
 }
 
