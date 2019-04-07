@@ -1,3 +1,4 @@
+import { EventEmitter } from "events";
 import { Application } from "express-serve-static-core";
 import fs from "fs";
 import jwt from "jsonwebtoken";
@@ -81,5 +82,10 @@ export class Jwt {
 export const register = (app: Application) => {
     Jwt.build().then((j: Jwt) => {
         app.locals.jwt = j;
+
+        process.nextTick(() => {
+            const emitter: EventEmitter = app.locals.eventEmitter;
+            emitter.emit("jwtReady", j);
+        });
     });
 };

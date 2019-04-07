@@ -8,18 +8,20 @@ export class WebSocketMessage {
      * mode.
      */
     public correlationId: string;
+    public username: string;
 }
 
 export abstract class OutGoingWebSocketMessage extends WebSocketMessage {
     public abstract args(): any;
 }
 
-export class IncomingWebSocketMessage extends WebSocketMessage {
-    public event: string;
+export class AuthToken extends WebSocketMessage {
+    public token: string;
 }
 
-export class AuthToken extends IncomingWebSocketMessage {
-    public token: string;
+export class StockPriceRequest extends WebSocketMessage {
+    public ticker: string;
+    public exchange: string;
 }
 
 export class User {

@@ -24,12 +24,12 @@ app.locals.io = io(server);
 
 eventEmitter.register(app);
 amqp.register(app);
-middleware.register(app);
+crypto.register(app);
 parsers.register(app);
 apiv1.register(app);
 redis.register(app);
-crypto.register(app);
 notifications.register(app);
+middleware.register(app);
 socketio.register(app);
 // only on dev mode - exclude this in production build
 mocks.register(app);

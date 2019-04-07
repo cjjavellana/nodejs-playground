@@ -13,6 +13,7 @@ const registerRESTAdvice = (app: Application) => {
 
 const registerWebSocketAdvice = (app: Application) => {
     const ioServer: io.Server = app.locals.io;
+
     ioServer.use((socket: Socket, next) => {
         console.log(socket);
         next();
