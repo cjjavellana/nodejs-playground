@@ -109,21 +109,19 @@ class NameSpace {
 
     // TODO: Include Username in the log
     protected logMessage(packet: Packet) {
-        const payload = this.payload(packet);
+        const event = packet[0];
+        const payload = packet[1];
+
         if (this.isIncomingWebSocketMessage(payload)) {
             // [WsIN] foobar authenticate xxxx-xxxx-xxxx-xxxx
-            const message = payload as IncomingWebSocketMessage;
-            console.log("[WsIN] %s %s %s", "foobar", message.event, message.correlationId);
+            console.log("[WsIN] %s %s %s", "foobar", event, payload.correlationId);
         } else {
             // be careful with this, if sensitive messages does not deserialize to
             // IncomingWebSocketMessage it could end up being logged
             const user = "foobar";
-            const messageAsTuple = payload as [string, any];
-            const event = messageAsTuple[0];
-            const messageBody = messageAsTuple[1];
             try {
                 // is it a json payload?
-                const jsonPayload = JSON.stringify(messageBody);
+                const jsonPayload = JSON.stringify(payload);
                 console.log("[WARN][WsIN] %s %s %s", user, event, jsonPayload);
             } catch (error) {
                 console.log("[WARN][WsIN] %s %s %s", user, event, payload);
