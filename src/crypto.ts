@@ -18,12 +18,10 @@ export class Jwt {
     }
     private static myInstance: Jwt;
 
-    private static loadFileToBuffer(keyPath: string): Promise<string> {
+    private static async loadFileToBuffer(keyPath: string): Promise<string> {
         const readFileAsync = promisify(fs.readFile);
-        return readFileAsync(keyPath)
-                .then((v: Buffer) => {
-                    return v.toString();
-                });
+        const v = await readFileAsync(keyPath);
+        return v.toString();
     }
     private privateKey: string;
     private publicKey: string;

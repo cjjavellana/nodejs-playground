@@ -187,7 +187,8 @@ class NewConnectionDesk {
     }
 
     protected obtainUser(): User {
-        return new User("cjavellana", [new Group("/admin")], [new Permission("equity", "stockPriceRequest", Authority.READ)]);
+        return new User("cjavellana", [new Group("/admin")],
+            [new Permission("equity-healthcare", "stockPriceRequest", Authority.READ)]);
     }
 
     protected sendDisclaimer(socket: Socket) {
