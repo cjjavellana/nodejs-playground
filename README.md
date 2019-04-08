@@ -163,5 +163,23 @@ $ openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
 Authentication
 ```bash
 $ curl -X POST -H 'Content-Type: application/json' -v http://localhost:8080/api/v1/login -d '{"username": "aaa", "password": "test"}'
+> POST /api/v1/login HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.54.0
+> Accept: */*
+> Content-Type: application/json
+> Content-Length: 39
+>
+* upload completely sent off: 39 out of 39 bytes
+< HTTP/1.1 200 OK
+< X-Powered-By: Express
+< X-Auth-Token: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYSIsImlhdCI6MTU1NDY3NzQyNywiZXhwIjoxNTU0NzIwNjI3LCJhdWQiOiJodHRwczovL2NqYXZlbGxhbmEubWUiLCJpc3MiOiJDamF2ZWxsYW5hIiwic3ViIjoiYWFhIn0.XZY5kkRqLQpnn_hooygAJqejwWEoM6SKrZyiO1C-sL679XvN_1ZrvKLj4XCNIBVn35_wW-d-z55KPcVmTz2205kCW5DPtjSs76mMkfdBhiLd__s3jugbJ-Tg7LRuT3q4mz8-W0ZfQE8iHgbx54zdzTX6x0o3SAWKxyX6eGv0bGg
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 170
+< ETag: W/"aa-w+JM3HPlXYWAeW0m3dU9QogokPQ"
+< Date: Sun, 07 Apr 2019 22:50:27 GMT
+< Connection: keep-alive
+<
+* Connection #0 to host localhost left intact
+{"message":{"username":"aaa","permissions":[{"module":"equities-healthcare","name":"search","authority":1},{"module":"equities-aviation","name":"search","authority":0}]}}
 ```
-

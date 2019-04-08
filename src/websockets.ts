@@ -103,6 +103,10 @@ class NameSpace {
             .on("authenticated", (socket: Socket) => {
                 this.registerHandlers(socket);
                 this.fireOnAuthenticatedHandlers(socket);
+            })
+            .on("unauthenticated", (socket: Socket, args: any) => {
+                console.log("Invalid Jwt Token Presented");
+                socket.emit("unauthenticated", args);
             });
     }
 
