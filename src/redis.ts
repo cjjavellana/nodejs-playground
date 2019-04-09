@@ -9,7 +9,6 @@ export const register = (app: Application) => {
 
     redisClient.on("connect", () => {
         console.log("Redis Connected");
+        app.locals.redis = redisClient;
     });
-
-    app.locals.redis = redisClient;
 };

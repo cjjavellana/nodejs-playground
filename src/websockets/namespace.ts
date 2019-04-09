@@ -15,6 +15,10 @@ export class Namespace {
         this.nsp = (namespace) ? ws.of(namespace) : ws;
     }
 
+    public to(room: string): io.Namespace {
+        return this.nsp.to(room);
+    }
+
     public on(eventName: string, listener: (socket: Socket, args?: any) => any): Namespace {
         this.listeners.set(eventName, listener);
         return this;

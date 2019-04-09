@@ -13,7 +13,7 @@ import * as parsers from "./parsers";
 import * as redis from "./redis";
 import * as mocks from "./routes/mocks/mocks";
 import * as apiv1 from "./routes/v1/auth";
-import * as socketio from "./websockets";
+import * as websockets from "./websockets/init";
 
 dotenv.config();
 
@@ -30,7 +30,7 @@ apiv1.register(app);
 redis.register(app);
 notifications.register(app);
 middleware.register(app);
-socketio.register(app);
+websockets.register(app);
 // only on dev mode - exclude this in production build
 mocks.register(app);
 
