@@ -33,7 +33,7 @@ vorpal
 
             io.emit('authenticate', {
                 'correlationId': uuid.v4(),
-                'token': "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYSIsImlhdCI6MTU1NDY3Nzg2NywiZXhwIjoxNTU0NzIxMDY3LCJhdWQiOiJodHRwczovL2NqYXZlbGxhbmEubWUiLCJpc3MiOiJDamF2ZWxsYW5hIiwic3ViIjoiYWFhIn0.Q-gGiYGZRChpl8thXVB46HGDi_oLIWqV1IwGmoCDntoc2cTFWBBxZY_tM6wdC9f5tYuGIqP7quzrB2SXjezk_1C4v0Ri2i33fBOzqWM_79k_qzFZaLPy5D146AiB3XN9lxMg98c8-ifq9yRIAlGMrQxfDfNL1hYpKwq-xEqJ4pk"
+                'token': "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYSIsImlhdCI6MTU1NDgxNTA3MCwiZXhwIjoxNTU0ODU4MjcwLCJhdWQiOiJodHRwczovL2NqYXZlbGxhbmEubWUiLCJpc3MiOiJDamF2ZWxsYW5hIiwic3ViIjoiYWFhIn0.T8YzQ6SNedbFZ1ODa7pfeVqPkIaacj7ssmoodAKv8AO3h0Q91Q54q9cuYcq_JwnEGvaaGKkwyAAEbw3NkRVF9iZ1WAJhsrGpgS4jq9e6nVjEww3cpA5Kdm2Yb9bP-RUVWbsl0bk2o9k-Ch9O4WK9fb5VvzYaVUdw_-PVw4XDKOI"
             });
 
             callback();
@@ -68,7 +68,7 @@ vorpal.command("sendmessage <message>")
 
         if (args.options.namespace &&
             args.options.namespace !== '/') {
-            // remove leading slash
+
             let namespace = args.options.namespace;
             let nspRef = globalNspHolder[namespace];
 
@@ -89,44 +89,3 @@ vorpal.command("sendmessage <message>")
 vorpal
     .delimiter('myapp$')
     .show();
-
-// nsp = {}
-
-// io.on('connect', (connected) => {
-//     console.log("WebSocket Connected")
-
-//     io.emit('authenticate', {
-//         'correlationId': uuid.v4(),
-//         'token': "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9." + 
-//             "eyJ1c2VybmFtZSI6ImFhYSIsImlhdCI6MTU1NDYzMjgyNSwiZXhwIjoxNTU0Njc2MDI1LCJhdWQiOiJodHRwczovL2NqYXZlbGxhbmEubWUiLCJpc3MiOiJDamF2ZWxsYW5hIiwic3ViIjoiYWFhIn0" + 
-//             ".HQ9anVCfltPHA7j3hrHpYRLGjN5o2AUnJfmzMIgItnY3wUJVjKuZoaA9gHxMmC2oQRkqYuT0scxt7Nh7oF6tgHi4gGR4lmeSZR1LLxJe_MkFnjiF1V8imzlrHtaqg4Vjr2TovMLpBr3PcAZT65TiB-O3s5AYnwNhjJC_guiiNfE"
-//     });
-
-// });
-
-// io.on('message', (message) => {
-//     console.log("Message %s", message);
-// })
-
-// io.on('connectToNsp', (message) => {
-//     console.log('Subscribing to namespace: ' + message.namespace);
-//     let nsp = require('socket.io-client')('http://localhost:8080' + message.namespace, {
-//         transports: ['websocket']
-//     });
-//     nsp.on('message', (m) => {
-//         console.log(m)
-//     })
-
-//     nsp[message.namespace] = nsp;
-// })
-
-// io.on('OnUploadCompleteEvent', (message) => {
-//     console.log("OnUploadCompleteEvent %s", message)
-// })
-
-// io.on('disconnect', (reason) => {
-//     console.log("Disconnected %s", reason)
-// });
-
-// io.emit('message', 'The jedi has arrived');
-
