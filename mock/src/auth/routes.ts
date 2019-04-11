@@ -52,7 +52,7 @@ export const register = (app: Application) => {
             res.header("X-Auth-Token", "aaabbbcccdddeeefff");
             res.send(roleSearch());
         } else {
-            res.status(401).send({"message": "Not Authorized"});
+            res.status(401).send({message: "Not Authorized"});
         }
     });
 
