@@ -7,20 +7,14 @@ import { Namespace } from "../namespace";
 export const register = (app: Application, nsp: Namespace) => {
     const eventEmitter: EventEmitter = app.locals.eventEmitter;
 
-    // validate client connecting to the default namespace
-    nsp.addEventHandler("stockPriceRequest", (socket: Socket, stockPriceRequest: any) => {
+    // move to an abstract event handler?
+    nsp.on("stockPriceRequest", (socket: Socket, stockPriceRequest: any) => {
         eventEmitter.on("stockPriceRequest", stockPriceRequest);
-    });
-
-    /**
-     * Demonstrates that event handler can still be registered after Namespace.build()
-     */
-    nsp.addEventHandler("afterInitDemo", (socket: Socket, msg: string) => {
+    }).on("afterInitDemo", (socket: Socket, msg: string) => {
         console.log("afterInitDemo %s", msg);
     });
 
     // ~ Outgoing messages here ==================================
-
     eventEmitter.on("uploadComplete", (uploadResults: MasterDataUploadResults) => {
         nsp.to(uploadResults.username).emit("uploadComplete", uploadResults);
     }).on("stockPriceResponse", (response: StockPriceResponse) => {

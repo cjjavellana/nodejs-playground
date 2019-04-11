@@ -20,6 +20,10 @@ export class NewConnectionDesk {
         this.redis = app.locals.redis;
     }
 
+    public createRoomForUser(socket: Socket) {
+        socket.join((socket as any).decoded_token.username);
+    }
+
     public instructClientToConnectToSecGroupNamespace(socket: Socket) {
         const userGroups = this.obtainUser().groups;
         userGroups.forEach((g) => this.askClientToConnectToSecGroupNamespace(socket, g.name));
@@ -33,7 +37,7 @@ export class NewConnectionDesk {
 
     protected sendDisclaimer(socket: Socket) {
         socket.send(`Welcome to the simple nodejs server.
-Use of this server is monitored for security purposes.`
+Use of this server is monitored for security purposes.\n`
         );
     }
 

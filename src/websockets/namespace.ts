@@ -77,23 +77,23 @@ export class Namespace {
 
     protected registerPerRequestAdvice(socket: Socket) {
         socket.use((packet: Packet, next) => {
-            this.logMessage(packet);
+            this.logMessage(socket, packet);
             next();
         });
     }
 
     // TODO: Include Username in the log
-    protected logMessage(packet: Packet) {
+    protected logMessage(socket: Socket, packet: Packet) {
+        const user = (socket as any).decoded_token.username;
         const event = packet[0];
         const payload = packet[1];
 
         if (this.isWebSocketMessage(payload)) {
             // [WsIN] foobar authenticate xxxx-xxxx-xxxx-xxxx
-            console.log("[WsIN] %s %s %s", "foobar", event, payload.correlationId);
+            console.log("[WsIN] %s %s %s", user, event, payload.correlationId);
         } else {
             // be careful with this, if sensitive messages does not deserialize to
             // WebSocketMessage it could end up being logged
-            const user = "foobar";
             try {
                 // is it a json payload?
                 const jsonPayload = JSON.stringify(payload);

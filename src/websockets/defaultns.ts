@@ -26,8 +26,10 @@ export const register = (app: Application, jwt: Jwt) => {
         decodedPropertyName: "decoded_token",
         secret: jwt.getPublicKey()
     })).onClientAuthenticated((socket: Socket) => {
+        newConnectionDesk.createRoomForUser(socket);
         newConnectionDesk.instructClientToConnectToSecGroupNamespace(socket);
-    }).build();
+    });
 
     pricing.register(app, ns);
+    ns.build();
 };
