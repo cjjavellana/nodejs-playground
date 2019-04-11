@@ -24,6 +24,11 @@ export class Namespace {
         return this;
     }
 
+    public addEventHandler(eventName: string, listener: (socket: Socket, args?: any) => void): Namespace {
+        this.nsp.on(eventName, listener);
+        return this;
+    }
+
     public onConnect(func: (socket: Socket) => void): Namespace {
         this.onConnectHandlers.push(func);
         return this;
@@ -43,7 +48,7 @@ export class Namespace {
         return this;
     }
 
-    public build() {
+    public build(): Namespace {
         this.nsp
             .on("connection", (socket: Socket) => {
                 this.registerRunOnConnectHandlers(socket);
@@ -56,6 +61,7 @@ export class Namespace {
                 console.log("Invalid Jwt Token Presented");
                 socket.emit("unauthenticated", args);
             });
+        return this;
     }
 
     protected fireOnAuthenticatedHandlers(socket: Socket) {

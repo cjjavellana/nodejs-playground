@@ -1,6 +1,5 @@
 import { EventEmitter } from "events";
 import { Application } from "express";
-import io from "socket.io";
 import { Jwt } from "../crypto";
 
 import * as adminNs from "./adminns";

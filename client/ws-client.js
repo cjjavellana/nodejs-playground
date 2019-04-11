@@ -33,7 +33,7 @@ vorpal
 
             io.emit('authenticate', {
                 'correlationId': uuid.v4(),
-                'token': "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYSIsImlhdCI6MTU1NDgxNTA3MCwiZXhwIjoxNTU0ODU4MjcwLCJhdWQiOiJodHRwczovL2NqYXZlbGxhbmEubWUiLCJpc3MiOiJDamF2ZWxsYW5hIiwic3ViIjoiYWFhIn0.T8YzQ6SNedbFZ1ODa7pfeVqPkIaacj7ssmoodAKv8AO3h0Q91Q54q9cuYcq_JwnEGvaaGKkwyAAEbw3NkRVF9iZ1WAJhsrGpgS4jq9e6nVjEww3cpA5Kdm2Yb9bP-RUVWbsl0bk2o9k-Ch9O4WK9fb5VvzYaVUdw_-PVw4XDKOI"
+                'token': "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYSIsImlhdCI6MTU1NDk4MzQzMCwiZXhwIjoxNTU1MDI2NjMwLCJhdWQiOiJodHRwczovL2NqYXZlbGxhbmEubWUiLCJpc3MiOiJDamF2ZWxsYW5hIiwic3ViIjoiYWFhIn0.jzbEWzknNUSWGEOQZEcIBuLqOs42OXCldRYt1A7_-UFlByC58wl3epWtzSjtQaMzOZ6dFd2Wv5347L_OoYGGRLwjiuGRqmIJdqRg4g5C4HRpyzS3fevI9N6y_B5Uapt4RtrSXbVXSU_zfaJn5Wll75UugV-ViMkMGy8hB8LhKO4"
             });
 
             callback();
@@ -79,12 +79,40 @@ vorpal.command("sendmessage <message>")
                 console.log("Namespace %s does not exist", namespace);
             }
         } else {
-
             io.emit("message", message);
         }
 
         callback();
-    })
+    });
+
+/**
+ * myapp$ emit afterInitDemo "Hello World"
+ */
+vorpal.command("emit <event> <message>")
+    .option('-n, --namespace <namespace>', 'The namespace to dispatch a \'message\' to.')
+    .action(function (args, callback) {
+        console.log(args);
+        let message = args.message;
+        let event = args.event;
+
+        if (args.options.namespace &&
+            args.options.namespace !== '/') {
+
+            let namespace = args.options.namespace;
+            let nspRef = globalNspHolder[namespace];
+            
+            if (nspRef) {
+                console.log("Sending %s to %s %s", message, event, namespace);
+                nspRef.emit(event, message);
+            } else {
+                console.log("Namespace %s does not exist", namespace);
+            }
+        } else {
+            io.emit(event, message);
+        }
+
+        callback();
+    });
 
 vorpal
     .delimiter('myapp$')

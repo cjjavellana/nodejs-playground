@@ -6,6 +6,7 @@ import { Jwt } from "../crypto";
 import { StockPriceResponse } from "../data";
 import { Namespace } from "./Namespace";
 import { NewConnectionDesk } from "./NewConnectionDesk";
+import * as pricing from "./pricing";
 
 /**
  * The default namespace handler
@@ -22,21 +23,12 @@ export const register = (app: Application, jwt: Jwt) => {
     // ~ Incoming messages here =================================
 
     // validate client connecting to the default namespace
-    defaultNs.onConnect(socketioJwt.authorize({
+    const ns = defaultNs.onConnect(socketioJwt.authorize({
         decodedPropertyName: "decoded_token",
         secret: jwt.getPublicKey()
     })).onClientAuthenticated((socket: Socket) => {
         newConnectionDesk.instructClientToConnectToSecGroupNamespace(socket);
-    }).on("stockPriceRequest", (socket: Socket, stockPriceRequest: any) => {
-        eventEmitter.on("stockPriceRequest", stockPriceRequest);
     }).build();
 
-    // ~ Outgoing messages here ==================================
-
-    eventEmitter.on("OnUploadCompleteEvent", (message: string) => {
-        defaultNs.emit("OnUploadCompleteEvent", message);
-    }).on("stockPriceResponse", (response: StockPriceResponse) => {
-        defaultNs.to(response.username).emit("stockPriceResponse", response);
-    });
-
+    pricing.register(app, ns);
 };

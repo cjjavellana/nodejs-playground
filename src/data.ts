@@ -26,22 +26,23 @@ export class StockPriceRequest extends WebSocketMessage {
 
 export class StockPriceResponse extends WebSocketMessage {
     public ticker: string;
-    public bestBid: BestBid;
-    public bestOffer: BestOffer;
+    public bestBid: Quote;
+    public bestOffer: Quote;
+    public marketDepth: Quote[];
 }
 
-export class BestOffer {
+export class Quote {
     public qty: number;
     public lotSize: number;
     public price: number;
     public exchange: string;
 }
 
-export class BestBid {
-    public qty: number;
-    public lotSize: number;
-    public price: number;
-    public exchange: string;
+export class MasterDataUploadResults extends WebSocketMessage {
+    public added: number;
+    public modified: number;
+    public ignored: number;
+    public errors: string[];
 }
 
 export class User {

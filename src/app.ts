@@ -13,7 +13,7 @@ import * as parsers from "./parsers";
 import * as redis from "./redis";
 import * as mocks from "./routes/mocks/mocks";
 import * as apiv1 from "./routes/v1/auth";
-import * as websockets from "./websockets/init";
+import * as websockets from "./websockets";
 
 dotenv.config();
 
