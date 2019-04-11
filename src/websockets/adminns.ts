@@ -3,7 +3,7 @@ import { Application } from "express";
 import { Socket } from "socket.io";
 import io from "socket.io";
 import { Metrics } from "../data";
-import { Namespace } from "./Namespace";
+import { Namespace } from "./namespace";
 
 export const register = (app: Application) => {
     const eventEmitter: EventEmitter = app.locals.eventEmitter;

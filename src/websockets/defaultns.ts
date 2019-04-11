@@ -3,9 +3,8 @@ import { Application } from "express";
 import io, { Socket } from "socket.io";
 import socketioJwt from "socketio-jwt";
 import { Jwt } from "../crypto";
-import { StockPriceResponse } from "../data";
-import { Namespace } from "./Namespace";
-import { NewConnectionDesk } from "./NewConnectionDesk";
+import { Namespace } from "./namespace";
+import { NewConnectionDesk } from "./newconnectiondesk";
 import * as pricing from "./pricing";
 
 /**

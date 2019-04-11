@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 import { Application } from "express";
 import { Socket } from "socket.io";
 import { MasterDataUploadResults, StockPriceResponse } from "../../data";
-import { Namespace } from "../Namespace";
+import { Namespace } from "../namespace";
 
 export const register = (app: Application, nsp: Namespace) => {
     const eventEmitter: EventEmitter = app.locals.eventEmitter;
