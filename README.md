@@ -132,11 +132,13 @@ $ nodemon app.js
 ```
 
 ### Running Test
+
 ```bash
 $ npm run test
 ```
 
 ## Dependencies
+
 1. Downstream Mocks
 
     * Mock service for downstream services  
@@ -146,12 +148,32 @@ $ npm run test
 
     * Exposed through redis default port 6379 (see docker-compose.yml).
 
+3. RabbitMQ
+
+    * Used for inter-service communication
+
+4. ELK
+
+    * Where logs are stored and analyzed
+    * Elastic search can be accessed at http://localhost:9200
+    * Kibana can be accessed at http://localhost:5601
+    * Logstash running a TCP input plugin is listening at localhost:4718
+
 ### Starting Dependencies
+
+To start the dependencies
+
+```bash
+$ docker-compose up -d redis mock rabbitmq elk
 ```
-$ docker-compose up -d redis mock rabbitmq
+
+To view the logs
+```bash
+$ docker-compose logs -f elk
 ```
 
 ### Generating keys for RS256
+
 ```bash
 # Generating private key. Dont put passphrase
 $ ssh-keygen -t rsa -b 1024 -m PEM -f jwtRS256.key
