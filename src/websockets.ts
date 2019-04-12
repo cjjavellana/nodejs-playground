@@ -1,9 +1,9 @@
 import { EventEmitter } from "events";
 import { Application } from "express";
-import { Jwt } from "../crypto";
+import { Jwt } from "./crypto";
 
-import * as adminNs from "./adminns";
-import * as defaultNs from "./defaultns";
+import * as adminNs from "./websockets/adminns";
+import * as defaultNs from "./websockets/defaultns";
 
 /**
  * The main module handling websocket communication.

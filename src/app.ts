@@ -7,6 +7,7 @@ import { AddressInfo } from "ws";
 import * as amqp from "./amqp";
 import * as crypto from "./crypto";
 import * as eventEmitter from "./emitters";
+import * as logger from "./logger";
 import * as middleware from "./middleware";
 import * as notifications from "./notifications";
 import * as parsers from "./parsers";
@@ -19,9 +20,9 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-
 app.locals.io = io(server);
 
+logger.register(app);
 eventEmitter.register(app);
 amqp.register(app);
 crypto.register(app);

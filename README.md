@@ -9,6 +9,7 @@ A playground for experimenting with:
 3. Websocket (Socket.IO) Channel
 
 ## The app.locals
+
 This section describes the services made available through ```app.locals```
 
 1. app.locals.io - The socket.io service. An instance of ```io.Server```
@@ -64,11 +65,13 @@ io.on('connectToNsp', (message) => {
 ### Supported Namespaces & Their Corresponding Events
 
 #### /admin namespace
+
 A namespace for admin users
 
 1. ```systemUtilization``` - An event fired every 5 seconds to broadcast system related metrics
 
 Subscribing to ```systemUtilization``` event.
+
 ```javascript
 nsp.on('systemUtilization', (metrics: Metrics) => {
     // handle broadcasted message
@@ -76,13 +79,15 @@ nsp.on('systemUtilization', (metrics: Metrics) => {
 ```
 
 ## /trader namespace
+
 A namespace for trader users
 
 ## Internal Events
+
 This section describes the events dispatched internally which can be subscribed to
 
 1. OnUploadCompleteEvent
-   
+
    The time it takes to process an uploaded file varies as a function of the contents of the file being processed. In addition to that, http requests in k8 is open for 30-60 sec before it's terminated by the cluster's HAProxy.
 
    To address the above mentioned issues without resorting to long polling, we make use of redis as the medium of communication between this service and the downstream processor. This service subscribes to a redis channel ```OnUploadCompleteEvent``` and internally rebroadcasts the messages it receives through ```events.EventEmitter```.
@@ -108,19 +113,21 @@ This section describes the events dispatched internally which can be subscribed 
         ioServer.emit("OnUploadCompleteEvent", message);
     });
    ```
-   
+
    In ```client.js```
 
    ```javascript
    io.on('OnUploadCompleteEvent', (message) => {
-       // handle message 
+       // handle message
    })
    ```
 
 ### Prerequisites
+
 1. Docker & Docker Compose. Get it from <a href="https://docs.docker.com">here</a>
 
 ### Debugging
+
 This project contains 2 debug configurations and been configured to be debugged in vscode. 
 
 See .vscode/launch.json for more details.
@@ -182,7 +189,9 @@ $ openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
 ```
 
 ### Test Requests
+
 Authentication
+
 ```bash
 $ curl -X POST -H 'Content-Type: application/json' -v http://localhost:8080/api/v1/login -d '{"username": "aaa", "password": "test"}'
 > POST /api/v1/login HTTP/1.1

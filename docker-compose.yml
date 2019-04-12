@@ -18,12 +18,15 @@ services:
       - "5672:5672"
   elk:
     image: sebp/elk
+    depends_on:
+      - rabbitmq
     environment:
       - ES_HEAP_SIZE=2g
       - MAX_MAP_COUNT=262144
       - ELASTICSEARCH_START=1
       - LOGSTASH_START=1
       - KIBANA_START=1
+      - RABBITMQ_HOST=rabbitmq
     volumes: 
       - ./elk/30-output.conf:/etc/logstash/conf.d/30-output.conf
     ports:
