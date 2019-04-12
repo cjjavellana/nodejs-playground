@@ -10,12 +10,21 @@ export const register = (app: Application) => {
 
     log4js.configure({
         appenders: {
-          out: { type: "stdout", layout: { type: "json", separator: "," } }
+            out: { type: "stdout", layout: { type: "json", separator: "," } }
         },
         categories: {
-          default: { appenders: ["out"], level: "info" }
+            default: { appenders: ["out"], level: "info" }
         }
-      });
+    });
 
-    app.locals.logger = log4js.getLogger("app");
+    const logger = log4js.getLogger("default");
+    app.locals.logger = logger;
+    app.use(log4js.connectLogger(logger, {
+        format: (req, res, format) => {
+            const reqId = req.headers["x-request-id"] || "";
+            return format(":remote-addr - -" + reqId + " \":method :url HTTP/:http-version\"" +
+                " :response-time :status :content-length");
+        },
+        level: "auto",
+    }));
 };
