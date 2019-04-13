@@ -33,7 +33,7 @@ vorpal
 
             io.emit('authenticate', {
                 'correlationId': uuid.v4(),
-                'token': "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYSIsImlhdCI6MTU1NDk4MzQzMCwiZXhwIjoxNTU1MDI2NjMwLCJhdWQiOiJodHRwczovL2NqYXZlbGxhbmEubWUiLCJpc3MiOiJDamF2ZWxsYW5hIiwic3ViIjoiYWFhIn0.jzbEWzknNUSWGEOQZEcIBuLqOs42OXCldRYt1A7_-UFlByC58wl3epWtzSjtQaMzOZ6dFd2Wv5347L_OoYGGRLwjiuGRqmIJdqRg4g5C4HRpyzS3fevI9N6y_B5Uapt4RtrSXbVXSU_zfaJn5Wll75UugV-ViMkMGy8hB8LhKO4"
+                'token': "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYSIsImlhdCI6MTU1NTE1OTYzNiwiZXhwIjoxNTU1MjAyODM2LCJhdWQiOiJodHRwczovL2NqYXZlbGxhbmEubWUiLCJpc3MiOiJDamF2ZWxsYW5hIiwic3ViIjoiYWFhIn0.Fcr-3b3ZWnfOSXSYhRcswMTHLzp-mCyYQEz8Y7mwWRKAbrV1CMyTf1mnBn2nC1_Qa-SjBgIXD5_B9MxnpVrfBYD5LQ3aCDss4_ee38MGgHVCDrORVHc9zlS8XaSEjcFUwNyZ-W4xbuTwxZFVm8MCabS47bUNSNCVck3ex7UNfJw"
             });
 
             callback();
@@ -79,7 +79,10 @@ vorpal.command("sendmessage <message>")
                 console.log("Namespace %s does not exist", namespace);
             }
         } else {
-            io.emit("message", message);
+            io.emit("message", {
+                "correlationId": uuid.v4(),
+                "message": message
+            });
         }
 
         callback();
@@ -100,7 +103,7 @@ vorpal.command("emit <event> <message>")
 
             let namespace = args.options.namespace;
             let nspRef = globalNspHolder[namespace];
-            
+
             if (nspRef) {
                 console.log("Sending %s to %s %s", message, event, namespace);
                 nspRef.emit(event, message);
