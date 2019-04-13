@@ -12,20 +12,16 @@ export const register = (app: Application) => {
 const addJSONLayout = () => {
     log4js.addLayout("json", (config: any) => {
         return (logEvent: LoggingEvent) => {
-            // copy the content of the data array
-            // as we are going to modify it when 
+            // copy the content of the data array as we are going to modify it when
             // resolving the message later on
-            const data: any[] = [];
-            logEvent.data.forEach((value) => {
-                data.push(value);
-            });
+            const data = [...logEvent.data];
 
             // merge logEvent.context (if any)
             // into our log object
             const logObj = {
                 ...{
                     category: logEvent.categoryName,
-                    level: logEvent.level,
+                    level: (logEvent.level as any).levelStr,
                     message: stringutils.resolve(data)
                 }, ...logEvent.context
             };
