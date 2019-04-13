@@ -5,7 +5,7 @@ import { OutGoingWebSocketMessage } from "../data";
 import { Log } from "../utils/logcontext";
 
 export class Namespace {
-    private static logger = log4js.getLogger("namespace");
+    private static logger = log4js.getLogger("websocket");
 
     private nsp: io.Server | io.Namespace;
     private app: Application;

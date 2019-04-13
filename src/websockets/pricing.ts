@@ -6,7 +6,7 @@ import { MasterDataUploadResults, StockPriceResponse } from "../data";
 import { Namespace } from "./namespace";
 
 export const register = (app: Application, nsp: Namespace) => {
-    const logger: Logger = log4js.getLogger("pricing");
+    const logger: Logger = log4js.getLogger("websocket");
     const eventEmitter: EventEmitter = app.locals.eventEmitter;
 
     // move to an abstract event handler?

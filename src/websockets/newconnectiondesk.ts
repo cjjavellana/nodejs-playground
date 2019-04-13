@@ -1,4 +1,5 @@
 import { Application } from "express";
+import log4js, { Logger } from "log4js";
 import { RedisClient } from "redis";
 import { Socket } from "socket.io";
 import uuid = require("uuid");
@@ -11,6 +12,7 @@ import { Authority, Group, Permission, User } from "../data";
  */
 export class NewConnectionDesk {
 
+    private static logger: Logger = log4js.getLogger("websocket");
     private app: Application;
     private jwt: Jwt;
     private redis: RedisClient;
@@ -21,7 +23,9 @@ export class NewConnectionDesk {
     }
 
     public createRoomForUser(socket: Socket) {
-        socket.join((socket as any).decoded_token.username);
+        const username = (socket as any).decoded_token.username;
+        NewConnectionDesk.logger.info("Creating room for %s", username);
+        socket.join(username);
     }
 
     public instructClientToConnectToSecGroupNamespace(socket: Socket) {
@@ -42,8 +46,12 @@ Use of this server is monitored for security purposes.\n`
     }
 
     protected askClientToConnectToSecGroupNamespace(socket: Socket, namespace: string) {
+        const username = (socket as any).decoded_token.username;
         const oneTimeToken = this.oneTimeToken();
         this.storeOneTimeTokenToCache(socket.id, this.oneTimeToken());
+
+        NewConnectionDesk.logger.info("Asking user %s to join namespace %s", username, namespace);
+
         socket.emit("connectToNsp", {
             namespace,
             token: oneTimeToken
