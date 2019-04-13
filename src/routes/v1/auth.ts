@@ -1,42 +1,40 @@
 import { Application, NextFunction, Request, Response } from "express";
+import log4js from "log4js";
 import { RedisClient } from "redis";
 import request = require("request");
 import { Jwt } from "../../crypto";
 import { LoginRequest } from "../../forms";
 import { AuthService } from "../../services/auth";
-import { handleResponse, isJSONString } from "../../utils";
+import { isJSONString } from "../../utils";
 
 export const register = (app: Application) => {
-
+    const logger = log4js.getLogger("routes-auth");
     const authClient = new AuthService();
 
     /**
      * Accepts a username & password delegates call to an auth service
      */
     app.post("/api/v1/login", (req: Request, res: Response, next: NextFunction) => {
-        const username = req.body.username;
-        const pwd = req.body.password;
-
         const loginForm = obtainLoginForm(req);
 
         authClient.authenticate(loginForm.getRequestId(),
             loginForm.username, loginForm.password, (error, resp, body) => {
-            if (error) {
-                console.log(error);
-                res.status(500).send("An error has occurred");
-            } else {
-                const bodyAsJson = JSON.stringify(body);
-                console.log("Downstream API %s Returned %s", resp.request.href, bodyAsJson);
+                if (error) {
+                    logger.error(error);
+                    res.status(500).send("An error has occurred");
+                } else {
+                    const bodyAsJson = JSON.stringify(body);
+                    logger.info("%s %s Response %s", loginForm.getRequestId(), resp.request.href, bodyAsJson);
 
-                if (isAuthSuccess(resp)) {
-                    // cache permissions, generate token
-                    cacheUserPermissionFor(loginForm.username, bodyAsJson);
-                    setTokenToHeader(res, tokenFor(loginForm.username));
+                    if (isAuthSuccess(resp)) {
+                        // cache permissions, generate token
+                        cacheUserPermissionFor(loginForm.username, bodyAsJson);
+                        setTokenToHeader(res, tokenFor(loginForm.username));
+                    }
+
+                    sendResponse(res, resp, body);
                 }
-
-                sendResponse(res, resp, body);
-            }
-        });
+            });
     });
 
     const setTokenToHeader = (res: Response, token: string) => res.setHeader("X-Auth-Token", token);

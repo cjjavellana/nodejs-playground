@@ -1,8 +1,11 @@
 import { Application } from "express";
+import log4js from "log4js";
 import io, { Packet, Socket } from "socket.io";
 import { OutGoingWebSocketMessage } from "../data";
+import { Log } from "../utils/logcontext";
 
 export class Namespace {
+    private static logger = log4js.getLogger("namespace");
 
     private nsp: io.Server | io.Namespace;
     private app: Application;
@@ -35,12 +38,20 @@ export class Namespace {
     }
 
     public send(message: OutGoingWebSocketMessage) {
-        console.log("[WsOUT Message] %s", message.correlationId);
-        this.nsp.send(message.args());
+        Log.withContext(Namespace.logger, message.correlationId, message.username,
+            "message", "out", () => {
+                Namespace.logger.info("%s", JSON.stringify(message));
+            });
+        this.nsp.send(message);
     }
 
-    public emit(event: string, args: any) {
-        this.nsp.emit(event, args);
+    public emit(event: string, message: OutGoingWebSocketMessage) {
+        Log.withContext(Namespace.logger, message.correlationId, message.username,
+            event, "out", () => {
+                Namespace.logger.info("%s", JSON.stringify(message));
+            });
+
+        this.nsp.emit(event, message);
     }
 
     public onClientAuthenticated(func: (socket: Socket) => void): Namespace {
@@ -58,7 +69,7 @@ export class Namespace {
                 this.fireOnAuthenticatedHandlers(socket);
             })
             .on("unauthenticated", (socket: Socket, args: any) => {
-                console.log("Invalid Jwt Token Presented");
+                Namespace.logger.info("%s Invalid Jwt Token Presented", socket.id);
                 socket.emit("unauthenticated", args);
             });
         return this;
@@ -89,17 +100,26 @@ export class Namespace {
         const payload = packet[1];
 
         if (this.isWebSocketMessage(payload)) {
-            // [WsIN] foobar authenticate xxxx-xxxx-xxxx-xxxx
-            console.log("[WsIN] %s %s %s", user, event, payload.correlationId);
+            const jsonPayload = JSON.stringify(payload);
+            Log.withContext(Namespace.logger, payload.correlationId,
+                user, event, "in", () => {
+                    Namespace.logger.info("%s", jsonPayload);
+                });
         } else {
             // be careful with this, if sensitive messages does not deserialize to
             // WebSocketMessage it could end up being logged
             try {
-                // is it a json payload?
                 const jsonPayload = JSON.stringify(payload);
-                console.log("[WARN][WsIN] %s %s %s", user, event, jsonPayload);
+
+                Log.withContext(Namespace.logger, payload.correlationId,
+                    user, event, "in", () => {
+                        Namespace.logger.warn("Message not in JSON => %s", jsonPayload);
+                    });
             } catch (error) {
-                console.log("[WARN][WsIN] %s %s %s", user, event, payload);
+                Log.withContext(Namespace.logger, payload.correlationId,
+                    user, event, "in", () => {
+                        Namespace.logger.error("Message not in JSON => %s", error);
+                    });
             }
         }
     }

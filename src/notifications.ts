@@ -1,4 +1,5 @@
 import { Application } from "express";
+import log4js from "log4js";
 import redis, { RedisClient } from "redis";
 
 /**
@@ -6,7 +7,7 @@ import redis, { RedisClient } from "redis";
  * @param app
  */
 export const register = (app: Application) => {
-
+    const logger = log4js.getLogger("logstash");
     const eventEmitter = app.locals.eventEmitter;
 
     const redisSubcriber: RedisClient = redis.createClient({
@@ -14,8 +15,11 @@ export const register = (app: Application) => {
         port: Number(process.env.REDIS_PORT)
     });
 
+    /**
+     * Called when 'redisSubscriber' successfully subscribed to 'channel'
+     */
     redisSubcriber.on("subscribe", (channel: string, count: number) => {
-        console.log("Subscribed to %s", channel);
+        logger.info("Subscribed to %s", channel);
     });
 
     redisSubcriber.on("message", (channel: string, message: string) => {

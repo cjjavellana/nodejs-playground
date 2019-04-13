@@ -2,10 +2,12 @@ import amqp, { AmqpConnectionManager, ChannelWrapper, SetupFunc } from "amqp-con
 import { Channel, ConfirmChannel, ConsumeMessage, Options } from "amqplib";
 import { EventEmitter } from "events";
 import { Application } from "express";
+import log4js from "log4js";
 import os from "os";
 import { MasterDataUploadResults } from "./data";
 
 export const register = (app: Application) => {
+    const logger = log4js.getLogger("logstash");
     const eventEmitter: EventEmitter = app.locals.eventEmitter;
 
     RabbitMQClient.connect()
@@ -27,7 +29,7 @@ export const register = (app: Application) => {
         setMasterDataHandlers(channel);
 
         eventEmitter.on("priceRequest", (args: any[]) => {
-            console.log(args);
+            logger.info(args);
         });
     };
 
@@ -80,7 +82,7 @@ export class MasterDataEventHandler extends BaseAmqpEventHandler {
 }
 
 export class AmqpMessageHandlers extends BaseAmqpEventHandler {
-
+    private logger = log4js.getLogger("logstash");
     private eventEmitter: EventEmitter;
 
     constructor(app: Application, channel: Channel) {
@@ -89,7 +91,7 @@ export class AmqpMessageHandlers extends BaseAmqpEventHandler {
     }
 
     public pxResponseHandler(msg: ConsumeMessage) {
-        console.log(msg.content.toString());
+        this.logger.info(msg.content.toString());
         this.channel.ack(msg);
     }
 

@@ -1,31 +1,38 @@
 import { Application } from "express";
-import log4js, { Logger, LoggingEvent } from "log4js";
+import log4js, { LoggingEvent } from "log4js";
+import * as stringutils from "./utils/strings";
 
 export const register = (app: Application) => {
-    const logger = log4js.getLogger("logstash");
+    const logger = log4js.getLogger();
 
     addJSONLayout();
     configureLog4js();
-    connectLog4jsToExpress(app, logger);
 };
 
 const addJSONLayout = () => {
     log4js.addLayout("json", (config: any) => {
         return (logEvent: LoggingEvent) => {
-            return JSON.stringify(logEvent);
+            // copy the content of the data array
+            // as we are going to modify it when 
+            // resolving the message later on
+            const data: any[] = [];
+            logEvent.data.forEach((value) => {
+                data.push(value);
+            });
+
+            // merge logEvent.context (if any)
+            // into our log object
+            const logObj = {
+                ...{
+                    category: logEvent.categoryName,
+                    level: logEvent.level,
+                    message: stringutils.resolve(data)
+                }, ...logEvent.context
+            };
+
+            return JSON.stringify(logObj);
         };
     });
-};
-
-const connectLog4jsToExpress = (app: Application, logger: Logger) => {
-    app.use(log4js.connectLogger(logger, {
-        format: (req, res, format) => {
-            const reqId = req.headers["x-request-id"] || "";
-            return format(":remote-addr - - " + reqId + " \":method :url HTTP/:http-version\"" +
-                " :response-time :status :content-length");
-        },
-        level: "auto",
-    }));
 };
 
 const configureLog4js = () => {
@@ -48,8 +55,8 @@ const configureLog4js = () => {
             /* tslint:enable:object-literal-sort-keys */
         },
         categories: {
-            default: { appenders: ["console"], level: "info" },
-            logstash: { appenders: ["logstash", "console"], level: "info" }
+            console: { appenders: ["console"], level: "info" },
+            default: { appenders: ["logstash", "console"], level: "info" }
         }
     });
 };

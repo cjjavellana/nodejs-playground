@@ -2,6 +2,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import express from "express";
 import http from "http";
+import log4js from "log4js";
 import io from "socket.io";
 import { AddressInfo } from "ws";
 import * as amqp from "./amqp";
@@ -19,10 +20,13 @@ import * as websockets from "./websockets";
 dotenv.config();
 
 const app = express();
+logger.register(app);
+
+const logstashLogger = log4js.getLogger("logstash");
 const server = http.createServer(app);
 app.locals.io = io(server);
 
-logger.register(app);
+middleware.register(app);
 eventEmitter.register(app);
 amqp.register(app);
 crypto.register(app);
@@ -30,7 +34,6 @@ parsers.register(app);
 apiv1.register(app);
 redis.register(app);
 notifications.register(app);
-middleware.register(app);
 websockets.register(app);
 // only on dev mode - exclude this in production build
 mocks.register(app);
@@ -42,5 +45,5 @@ app.get( "/", ( req, res ) => {
 
 // start our server
 server.listen(process.env.SERVER_PORT || 8999, () => {
-    console.log(`Server started on port ${(server.address() as AddressInfo).port} :)`);
+    logstashLogger.info(`Server started on port ${(server.address() as AddressInfo).port} :)`);
 });
