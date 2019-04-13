@@ -1,13 +1,34 @@
 import { Application } from "express";
-import log4js, { LoggingEvent } from "log4js";
+import log4js, { Logger, LoggingEvent } from "log4js";
 
 export const register = (app: Application) => {
+    const logger = log4js.getLogger("logstash");
+
+    addJSONLayout();
+    configureLog4js();
+    connectLog4jsToExpress(app, logger);
+};
+
+const addJSONLayout = () => {
     log4js.addLayout("json", (config: any) => {
         return (logEvent: LoggingEvent) => {
             return JSON.stringify(logEvent);
         };
     });
+};
 
+const connectLog4jsToExpress = (app: Application, logger: Logger) => {
+    app.use(log4js.connectLogger(logger, {
+        format: (req, res, format) => {
+            const reqId = req.headers["x-request-id"] || "";
+            return format(":remote-addr - - " + reqId + " \":method :url HTTP/:http-version\"" +
+                " :response-time :status :content-length");
+        },
+        level: "auto",
+    }));
+};
+
+const configureLog4js = () => {
     log4js.configure({
         appenders: {
             console: { type: "console" },
@@ -31,15 +52,4 @@ export const register = (app: Application) => {
             logstash: { appenders: ["logstash", "console"], level: "info" }
         }
     });
-
-    const logger = log4js.getLogger("logstash");
-    app.locals.logger = logger;
-    app.use(log4js.connectLogger(logger, {
-        format: (req, res, format) => {
-            const reqId = req.headers["x-request-id"] || "";
-            return format(":remote-addr - - " + reqId + " \":method :url HTTP/:http-version\"" +
-                " :response-time :status :content-length");
-        },
-        level: "auto",
-    }));
 };

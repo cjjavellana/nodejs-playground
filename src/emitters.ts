@@ -1,10 +1,9 @@
 import events from "events";
 import { Application } from "express";
-import { Logger } from "log4js";
+import log4js, { Logger } from "log4js";
 
 export const register = (app: Application) => {
-    const logger: Logger = app.locals.logger;
-
+    const logger: Logger = log4js.getLogger("logstash");
     logger.info("Event Emitter Initialized");
     app.locals.eventEmitter = new events.EventEmitter();
 };
