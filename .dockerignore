@@ -1,0 +1,12 @@
+node_modules
+docker-compose.yml
+Dockerfile
+.vscode
+client
+dist
+elk
+mock
+test
+.DS_Store
+.git
+.dockerignore

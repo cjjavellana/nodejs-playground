@@ -1,4 +1,4 @@
-import { Application, NextFunction, Request, Response } from "express";
+import { Application, NextFunction, Request, Response, Router } from "express";
 import log4js from "log4js";
 import { RedisClient } from "redis";
 import request = require("request");
@@ -9,12 +9,10 @@ import { isJSONString } from "../../utils";
 
 export const register = (app: Application) => {
     const logger = log4js.getLogger("routes-auth");
+    const router = Router();
     const authClient = new AuthService();
 
-    /**
-     * Accepts a username & password delegates call to an auth service
-     */
-    app.post("/api/v1/login", (req: Request, res: Response, next: NextFunction) => {
+    router.post("/login", (req: Request, res: Response, next: NextFunction) => {
         const loginForm = obtainLoginForm(req);
 
         authClient.authenticate(loginForm.getRequestId(),
@@ -66,4 +64,6 @@ export const register = (app: Application) => {
     };
 
     const isAuthSuccess = (resp: request.Response) => resp.statusCode === 200;
+
+    app.use("/api/v1", router);
 };

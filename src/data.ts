@@ -11,9 +11,6 @@ export class WebSocketMessage {
     public username: string;
 }
 
-export abstract class OutGoingWebSocketMessage extends WebSocketMessage {
-}
-
 export class AuthToken extends WebSocketMessage {
     public token: string;
 }
@@ -80,7 +77,7 @@ export enum Authority {
     READ, WRITE, READ_WRITE
 }
 
-export class Metrics extends OutGoingWebSocketMessage {
+export class Metrics extends WebSocketMessage {
     public metrics: string;
     public periodStart: Date;
     public periodEnd: Date;

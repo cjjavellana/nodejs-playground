@@ -1,7 +1,7 @@
 import { Application } from "express";
 import log4js from "log4js";
 import io, { Packet, Socket } from "socket.io";
-import { OutGoingWebSocketMessage } from "../data";
+import { WebSocketMessage } from "../data";
 import { Log } from "../utils/logcontext";
 
 export class Namespace {
@@ -37,7 +37,7 @@ export class Namespace {
         return this;
     }
 
-    public send(message: OutGoingWebSocketMessage) {
+    public send(message: WebSocketMessage) {
         Log.withContext(Namespace.logger, message.correlationId, message.username,
             "message", "out", () => {
                 Namespace.logger.info("%s", JSON.stringify(message));
@@ -45,7 +45,7 @@ export class Namespace {
         this.nsp.send(message);
     }
 
-    public emit(event: string, message: OutGoingWebSocketMessage) {
+    public emit(event: string, message: WebSocketMessage) {
         Log.withContext(Namespace.logger, message.correlationId, message.username,
             event, "out", () => {
                 Namespace.logger.info("%s", JSON.stringify(message));
@@ -93,7 +93,6 @@ export class Namespace {
         });
     }
 
-    // TODO: Include Username in the log
     protected logMessage(socket: Socket, packet: Packet) {
         const user = (socket as any).decoded_token.username;
         const event = packet[0];

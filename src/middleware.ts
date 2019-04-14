@@ -11,15 +11,18 @@ export const register = (app: Application) => {
 const registerRESTAdvice = (app: Application) => {
     const logger = log4js.getLogger("middleware");
     app.use([(req: Request, resp: Response, next: NextFunction) => {
-        const requestStartTime = Date.now();
-        const requestId = req.headers["x-request-id"] || uuid.v4();
-        logger.info("[Request Start] %s %s", requestId, req.url);
+        const requestId = req.headers["x-request-id"];
+        if (!requestId) {
+            req.headers["x-request-id"] = uuid.v4();
+        }
+
+        logger.info("[Request Start] %s %s", req.headers["x-request-id"], req.url);
         next();
     },
     log4js.connectLogger(logger, {
         format: (req, res, format) => {
-            const reqId = req.headers["x-request-id"] || "";
-            return format(":remote-addr - - " + reqId + " \":method :url HTTP/:http-version\"" +
+            const reqId = req.headers["x-request-id"] || "no-request-id";
+            return format("[Request Completed] :remote-addr - - " + reqId + " \":method :url HTTP/:http-version\"" +
                 " :response-time :status :content-length");
         },
         level: "auto",

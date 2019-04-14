@@ -5,9 +5,10 @@
   "main": "dist/app.js",
   "scripts": {
     "clean": "rimraf dist/*",
+    "misc": "copyfiles -u 1 src/**/*.html src/**/*.properties dist/",
     "lint": "tslint -c tslint.json -p tsconfig.json --fix",
     "tsc": "tsc",
-    "build": "npm-run-all lint tsc",
+    "build": "npm-run-all lint tsc misc",
     "dev:start": "npm-run-all build start",
     "dev": "nodemon --watch src -e ts,ejs --exec npm run dev:start",
     "start": "node .",
@@ -26,9 +27,11 @@
     "express": "^4.16.4"
   },
   "devDependencies": {
+    "copyfiles": "^2.1.0",
     "lint": "^1.1.2",
     "nodemon": "^1.18.10",
     "npm-run-all": "^4.1.5",
+    "rimraf": "^2.6.3",
     "tslint": "^5.14.0",
     "typescript": "^3.1.6"
   }

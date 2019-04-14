@@ -5,7 +5,7 @@
             "type": "node",
             "request": "launch",
             "name": "Build Project",
-            "program": "${workspaceFolder}/src/app.ts",
+            "program": "${workspaceFolder}/src/bin/local.ts",
             "preLaunchTask": "npm: build",
             "sourceMaps": true,
             "smartStep": true,
