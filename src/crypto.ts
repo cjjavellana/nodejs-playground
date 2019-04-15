@@ -9,8 +9,8 @@ export class Jwt {
 
     public static async build(): Promise<Jwt> {
         if (!this.myInstance) {
-            const priv = await this.loadFileToBuffer(path.join(__dirname, "..", "jwtRS256.key"));
-            const pub = await this.loadFileToBuffer(path.join(__dirname, "..", "jwtRS256.key.pub"));
+            const priv = process.env.JWT_PRIVATE_KEY;
+            const pub = process.env.JWT_PUBLIC_KEY;
             this.myInstance =  new Jwt(priv, pub);
         }
 
@@ -18,11 +18,6 @@ export class Jwt {
     }
     private static myInstance: Jwt;
 
-    private static async loadFileToBuffer(keyPath: string): Promise<string> {
-        const readFileAsync = promisify(fs.readFile);
-        const v = await readFileAsync(keyPath);
-        return v.toString();
-    }
     private privateKey: string;
     private publicKey: string;
 
@@ -48,7 +43,7 @@ export class Jwt {
     // ~
 
     public verify(token: string): any {
-        return jwt.verify(token, this.publicKey, this.verifyOptions());
+        return jwt.verify(token, this.getPublicKey(), this.verifyOptions());
     }
 
     private payload(username: string): any {

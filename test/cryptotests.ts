@@ -1,8 +1,11 @@
 import assert from "assert";
 import { describe, it } from "mocha";
 import { Jwt } from "../src/crypto";
+import * as dotenv from "../src/loadenv";
 
 describe('Jwt Crypto Tests', () => {
+    dotenv.config()
+
     it('It can load public & private keys', () => {
         Jwt.build().then((j: Jwt) => {
             assert(j.getPrivateKey() != undefined)

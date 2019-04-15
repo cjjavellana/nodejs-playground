@@ -1,5 +1,4 @@
 import bodyParser from "body-parser";
-import dotenv from "dotenv";
 import express from "express";
 import http from "http";
 import log4js from "log4js";
@@ -7,21 +6,22 @@ import io from "socket.io";
 import * as amqp from "./amqp";
 import * as crypto from "./crypto";
 import * as eventEmitter from "./emitters";
-import * as logger from "./logger";
+import * as dotenv from "./loadenv";
+import * as logConfig from "./logger";
 import * as middleware from "./middleware";
 import * as notifications from "./notifications";
 import * as parsers from "./parsers";
 import * as redis from "./redis";
 import * as apiv1 from "./routes/v1/auth";
 import * as websockets from "./websockets";
-
 dotenv.config();
 
 const app = express();
+logConfig.register(app);
+
 const server = http.createServer(app);
 app.locals.io = io(server);
 
-logger.register(app);
 middleware.register(app);
 eventEmitter.register(app);
 amqp.register(app);
